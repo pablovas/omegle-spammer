@@ -39,10 +39,8 @@ const { chromium } = require('playwright');
   //Verify if textarea exist and start loop
   while (true) {
     const textArea = await page.$('textarea.chatmsg');
-
     if (textArea) {
       const isEnabled = await textArea.isEnabled();
-
       if (isEnabled) {
         // Type into the textarea and send the message
         await textArea.type('Your message');
@@ -53,17 +51,14 @@ const { chromium } = require('playwright');
         await page.keyboard.press('Escape');
         await page.keyboard.press('Escape');
         console.log('Starting a new chat');
-      
       } else {
         //if textarea is not enabled, start another chat
         console.log('Textarea element is disabled. Starting a new chat...');
         await page.keyboard.press('Escape');
       }
-
     } else {
       console.log('Bonk! Textarea element not found.');
     }
-    
     await page.waitForTimeout(10000);
   }
 })();
