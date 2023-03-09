@@ -13,15 +13,15 @@ const { chromium } = require('playwright');
   await page.click('#textbtn');
 
   //Check the first checkbox
-  const firstCheck = await page.$('label strong');
-  if (firstCheck) {
-    await firstCheck.click();
+  const firstCheckBox = await page.$('label strong');
+  if (firstCheckBox) {
+    await firstCheckBox.click();
   }
 
   //Check the second checkbox
-  const ndCheck = await page.$("//label[contains(., 'By checking the box you acknowledge that you have reviewed and agree to be bound by ')]");
-  if (ndCheck) {
-    await ndCheck.click();
+  const ndCheckBox = await page.$("//label[contains(., 'By checking the box you acknowledge that you have reviewed and agree to be bound by ')]");
+  if (ndCheckBox) {
+    await ndCheckBox.click();
   }
 
   //Delay to see if the checkbox is checked
@@ -35,9 +35,9 @@ const { chromium } = require('playwright');
     const textArea = await page.$('textarea.chatmsg');
 
     if (textArea) {
-      const isEnabled = await textArea.isEnabled();
+      const enabledText = await textArea.isEnabled();
       
-      if (isEnabled) {
+      if (enabledText) {
         // Type into the textarea and send the message
         await textArea.type('Your message');
         await textArea.press('Enter');
