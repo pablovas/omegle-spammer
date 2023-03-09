@@ -59,6 +59,6 @@ const { chromium } = require('playwright');
     } else {
       console.log('Bonk! Textarea element not found.');
     }
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(10000);
   }
 })();
