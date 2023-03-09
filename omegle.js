@@ -5,7 +5,7 @@ const { chromium } = require('playwright');
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext();
   const page = await context.newPage();
-  
+
   await page.goto('https://www.omegle.com/');
   await page.waitForSelector('#textbtn');
 
@@ -17,7 +17,7 @@ const { chromium } = require('playwright');
   if (firstCheck) {
     await firstCheck.click();
   }
-  
+
   //Check the second checkbox
   const ndCheck = await page.$("//label[contains(., 'By checking the box you acknowledge that you have reviewed and agree to be bound by ')]");
   if (ndCheck) {
@@ -39,8 +39,10 @@ const { chromium } = require('playwright');
   //Verify if textarea exist and start loop
   while (true) {
     const textArea = await page.$('textarea.chatmsg');
+
     if (textArea) {
       const isEnabled = await textArea.isEnabled();
+
       if (isEnabled) {
         // Type into the textarea and send the message
         await textArea.type('Your message');
@@ -50,15 +52,18 @@ const { chromium } = require('playwright');
         // Press the Esc key two times to go out of the chat
         await page.keyboard.press('Escape');
         await page.keyboard.press('Escape');
-        console.log('Starting a new chat')
+        console.log('Starting a new chat');
+      
       } else {
         //if textarea is not enabled, start another chat
         console.log('Textarea element is disabled. Starting a new chat...');
         await page.keyboard.press('Escape');
       }
+
     } else {
       console.log('Bonk! Textarea element not found.');
     }
+    
     await page.waitForTimeout(10000);
   }
 })();
