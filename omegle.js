@@ -1,8 +1,8 @@
 //CODE MADE WITH LOVE BY @guaxinin and @al_interpol
-const { chromium } = require('playwright');
+const { firefox } = require('playwright');
 
 (async () => {
-  const browser = await chromium.launch({ headless: false });
+  const browser = await firefox.launch({ headless: false });
   const context = await browser.newContext();
   const page = await context.newPage();
 
