@@ -50,16 +50,41 @@ const TelegramBot = require('node-telegram-bot-api');
         await page.waitForTimeout(700);
         await textArea.press('Enter');
         console.log('Sent message');
-        await page.waitForTimeout(2000);
-        // Press the Esc key two times to go out of the chat
-        await page.keyboard.press('Escape');
-        await page.keyboard.press('Escape');
-        console.log('Starting a new chat')
-      } else {
-        //if textarea is not enabled, start another chat
-        console.log('Textarea element is disabled. Starting a new chat...');
-        await page.keyboard.press('Escape');
+        await page.waitForTimeout(1000);
+        
+        // Verify if stranger is exit of chat to know how many times Esc will be pressed
+        const videoBtn = await page.$('.newchatbtnwrapper');
+        if (videoBtn) {
+          await page.keyboard.press('Escape');
+          console.log('Video button find');
+        
+        } else {
+          for (let i = 0; i < 3; i++) {
+            await page.keyboard.press('Escape', {delay: 300});
+          }        
+          console.log('Video button dont find');
+        }
+        console.log('Starting a new chat');
+      }          
+      
+      // Verify if captcha is really in the screen to close service or not
+      const captchaSelector = '[title="reCAPTCHA"]';
+      const captcha = await page.$(captchaSelector);
+      if (captcha) {
+        const captchaIsVisible = await captcha.isVisible();
+        
+        if (captchaIsVisible) {
+          console.log('Captcha está visível na página');
+          bot.sendMessage(myChatId, 'Captcha encontrado! Finalizando serviço.');
+          await browser.close();
+
+        } else {
+          console.log('Captcha não está visível na página');
+          await page.waitForTimeout(2000);
+          await page.keyboard.press('Escape');
+        }
       }
+    
     } else {
       console.log('Bonk! Textarea element not found.');
       bot.sendMessage(myChatId, 'O bot está sendo desligado. 💤');
