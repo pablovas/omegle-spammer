@@ -72,16 +72,10 @@ const TelegramBot = require('node-telegram-bot-api');
       const captcha = await page.$(captchaSelector);
       if (captcha) {
         const captchaIsVisible = await captcha.isVisible();
-        
         if (captchaIsVisible) {
           console.log('Captcha está visível na página');
           bot.sendMessage(myChatId, 'Captcha encontrado! Finalizando serviço.');
           await browser.close();
-
-        } else {
-          console.log('Captcha não está visível na página');
-          await page.waitForTimeout(2000);
-          await page.keyboard.press('Escape');
         }
       }
     
