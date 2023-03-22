@@ -48,46 +48,31 @@ const TelegramBot = require('node-telegram-bot-api');
       const isEnabled = await textArea.isEnabled();
       if (isEnabled) {
         // Type into the textarea and send the message
-        await textArea.type('Your message', { delay: 100 });
-        await page.waitForTimeout(700);
+        await textArea.type('Your message');
+        await page.waitForTimeout(500);
         await textArea.press('Enter');
         console.log('Sent message');
-        await page.waitForTimeout(1000);
+        await page.keyboard.press('Escape');
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(5000);
         count++;
 
-        // Verify if stranger is exit of chat to know how many times Esc will be pressed
-        const videoBtn = await page.$('.newchatbtnwrapper');
-        if (videoBtn) {
-          await page.keyboard.press('Escape');
-          console.log('Video button find');
-
-        } else {
-          for (let i = 0; i < 3; i++) {
-            await page.keyboard.press('Escape', {delay: 300});
-          }        
-          console.log('Video button dont find');
-        }
-
         if (count === 60) {
-          console.log('Waiting for half hour to dont get captcha.');
-          bot.sendMessage(myChatId, '🚨🚨🚨Pausando por meia hora, para evitar captchas.🚨🚨🚨');
-          await page.waitForTimeout(1800000);
+          console.log('Waiting for one hour to dont get captcha.');
+          bot.sendMessage(myChatId, '🚨🚨🚨Pausando por uma hora, para evitar captchas.🚨🚨🚨');
+          await page.waitForTimeout(3600000);
           count = 0;
           console.log('Starting again...');
           bot.sendMessage(myChatId, '🔰Retomando envio de mensagens.🔰');
-                    const videoBtn = await page.$('.newchatbtnwrapper');
-          if (videoBtn) {
-            await page.keyboard.press('Escape');
-            console.log('Video button find');
-  
-          } else {
-            for (let i = 0; i < 3; i++) {
-              await page.keyboard.press('Escape', {delay: 300});
-            }        
-            console.log('Video button dont find');
-          }
+          await page.keyboard.press('Escape');
+
         }
         console.log('Starting a new chat number ', {count});
+      
+      } else {
+        // If textarea is not enabled, start another chat
+        console.log('Textarea element is disabled. Starting a new chat...');
+        await page.keyboard.press('Escape');
       }
 
       // Verify if captcha is really in the screen to close service or not
