@@ -10,17 +10,11 @@ const TelegramBot = require('node-telegram-bot-api');
   const myChatId = 'YOUR_CHAT_ID';
 
   let count = 0;
-  // Get the current date and time
-  const now = new Date();
 
-  // Get the current hour and minute
-  const hour = now.getHours();
-  const minute = now.getMinutes();
-
-  await page.goto('https://www.omegle.com/');
   console.log('Initiating process...');
   bot.sendAnimation(myChatId, 'https://media4.giphy.com/media/6pUjuQQX9kEfSe604w/giphy.gif?cid=ecf05e47aokiybnwwcb9r9fvsqg58y0xwaztfennjib0d42e&rid=giphy.gif&ct=g', {caption: 'Iniciando rotina...'});
 
+  await page.goto('https://www.omegle.com/');
   await page.waitForSelector('#textbtn');
   await page.waitForTimeout(1500);
 
@@ -50,8 +44,13 @@ const TelegramBot = require('node-telegram-bot-api');
   //Verify if textarea exist and start loop
   while (true) {
     const textArea = await page.$('textarea.chatmsg');
+    const data = new Date();
+    const horas = data.getHours();
+    const minutos = data.getMinutes();
+
     if (textArea) {
       const isEnabled = await textArea.isEnabled();
+
       if (isEnabled) {
         // Type into the textarea and send the message
         await textArea.type('Your message');
@@ -64,14 +63,30 @@ const TelegramBot = require('node-telegram-bot-api');
         count++;
 
         if (count === 60) {
-          console.log('Waiting for 15 min to dont get captcha. Agora são ', hour,':',minute);
-          bot.sendMessage(myChatId, '🚨🚨🚨Pausando por 15 min, para evitar captchas.🚨🚨🚨');
-          await page.waitForTimeout(900000);
+          console.log(`It is ${horas} hours and ${minutos} minutes. Waiting for 30 min to dont get captcha!`);
+          function loadingAnimation() {
+            let i = 0;
+            const animationInterval = setInterval(() => {
+              const progressBar = `[${'='.repeat(i)}${' '.repeat(52 - i)}]`;
+              process.stdout.write(`\r${progressBar}`);
+              i = (i + 1) % 53;
+            }, 100);
+            return () => {
+              clearInterval(animationInterval);
+              process.stdout.write(`\r[${'='.repeat(52)}]\n`);
+            };
+          }
+          const stopLoadingAnimation = loadingAnimation();
+          setTimeout(() => {
+            stopLoadingAnimation();
+            console.log('Carregamento completo!');
+          }, 1800000);  
+          bot.sendMessage(myChatId, `🚨🚨🚨Pausando por 30 min, para evitar captchas.🚨🚨🚨`);
+          await page.waitForTimeout(1800000);
           count = 0;
-          console.log('Starting again... Agora são ', hour,':',minute);
-          bot.sendMessage(myChatId, '🔰Retomando envio de mensagens.🔰');
+          console.log(`It is ${horas} hours and ${minutos} minutes., starting again...`);
+          bot.sendMessage(myChatId, `🔰Retomando envio de mensagens.🔰`);
           await page.keyboard.press('Escape');
-
         }
         console.log('Starting a new chat number ', count);
       
@@ -87,24 +102,25 @@ const TelegramBot = require('node-telegram-bot-api');
       if (captcha) {
         const captchaIsVisible = await captcha.isVisible();
         if (captchaIsVisible) {
-          console.log('Captcha está visível na página');
+          console.log('Captcha is visible in browser, shuting down...');
           bot.sendMessage(myChatId, 'Captcha encontrado! Finalizando serviço.');
           await browser.close();
         }
       }
 
     } else {
-      console.log('Bonk! Textarea element not found.');
+      console.log('Bonk! Textarea element not found.', ` It is ${horas} hours and ${minutos} minutes.`);
       bot.sendAnimation(myChatId, 'https://media.giphy.com/media/TC8AiZrjV2Qo0/giphy.gif', {caption: 'O bot está sendo desligado. 💤'});
       await browser.close();
     }
 
-    // Check if the current time is between 1:00 am and 2:30 am
-    if (hour === 1 && minute >= 0 || hour === 2 && minute <= 30) {
-      // If it is, send a message and close the browser
+    //  Verify which hours are to shutdown the browser
+    if (horas === 00 && minutos >= 30) {
+      console.log(` It is time to shutdown, it is ${horas} hours and ${minutos} minutes.`);
       bot.sendAnimation(myChatId, 'https://media.giphy.com/media/TC8AiZrjV2Qo0/giphy.gif', {caption: 'O bot está sendo desligado. 💤'});
       await browser.close();
     }
+
     await page.waitForTimeout(1000);
   }
 })();
